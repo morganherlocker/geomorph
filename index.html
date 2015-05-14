@@ -69,16 +69,6 @@ window.onload = function(){
            }, (interval*10) / feature.geometry.coordinates.length)
         }
         animate(feature.geometry.coordinates.length)
-        /*setTimeout(function(){
-          var setline = setInterval(function(){
-            visible.features[id].geometry.coordinates.push(feature.geometry.coordinates[segment])
-            map.featureLayer.setGeoJSON(visible)
-            segment++
-            if(segment === feature.geometry.coordinates.length) {
-              clearInterval(setline)
-            }
-          }, interval / feature.geometry.coordinates.length)
-        }, 1000)*/
       } else if(feature.geometry.type === 'MultiLineString') {
         visible.features.push(feature)
         map.featureLayer.setGeoJSON(visible)
