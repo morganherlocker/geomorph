@@ -6,17 +6,21 @@ var normalize = require('geojson-normalize')
 var flatten = require('geojson-flatten')
 var turf = require('turf')
 
-setTimeout(function() {
+if(argv.h || argv.help){
+  docs();
+} else {
   ((argv._[0] && fs.createReadStream(argv._[0])) || process.stdin).pipe(concat(function(geo){
     var geo = geo.toString()
     geo = processGeo(geo)
     fs.readFile(__dirname+'/index.html', 'utf8', function(err, html){
       html = html.split('{{geojson}}').join(geo)
+      if(argv.s) argv.speed = argv.s
+      if(argv.speed) html = html.split('{{speed}}').join(argv.speed)
+      else html = html.split('{{speed}}').join(400)
       console.log(html)
     })
   }))
-}, 10);
-
+}
 
 function processGeo (geo) {
   geo = JSON.parse(geo)
@@ -54,6 +58,14 @@ function processGeo (geo) {
       throw new Error('Unimplemented Type: '+feature.type+' - '+feature.geometry.type)
     }
   })
-//console.log(JSON.stringify(broken))
+
   return JSON.stringify(broken)
+}
+
+function docs(){
+  console.log('geomorph\n===\n');
+  console.log('geomorph [file] | hcat\n');
+  console.log('cat [file] | geomorph | hcat\n');
+  console.log('-s --speed : number of miliseconds per frame\n');
+  console.log('-h --help : show docs\n');
 }

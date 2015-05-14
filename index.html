@@ -24,7 +24,7 @@ window.onload = function(){
 
   map.fitBounds(features.getBounds())
 
-  var interval = 500
+  var interval = {{speed}}
   var f = 0
   var visible = turf.featurecollection([])
   setInterval(function(){
