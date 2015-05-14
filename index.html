@@ -36,63 +36,63 @@ window.onload = function(){
     }
   })
 
-  var interval = 300
+  var interval = 600
   var f = 0
   var visible = turf.featurecollection([])
   var animating = false
   setInterval(function(){
     var feature = geo.features[f]
     if(!animating){
-    if(feature.geometry.type === 'Point' || feature.geometry.type === 'MultiPoint') {
-      visible.features.push(feature)
-      map.featureLayer.setGeoJSON(visible)
-    } else if(feature.geometry.type === 'LineString') {
-      animating = true
-      visible.features.push(turf.linestring([], feature.properties))
-      var id = visible.features.length - 1
-      var segment = 0
-      var animate = function (i) {
-         setTimeout(function () {
-            if(!visible.features[id]){
-              visible.features[id] = turf.linestring([], feature.properties)
-            }
+      if(feature.geometry.type === 'Point' || feature.geometry.type === 'MultiPoint') {
+        visible.features.push(feature)
+        map.featureLayer.setGeoJSON(visible)
+      } else if(feature.geometry.type === 'LineString') {
+        animating = true
+        visible.features.push(turf.linestring([], feature.properties))
+        var id = visible.features.length - 1
+        var segment = 0
+        var animate = function (i) {
+           setTimeout(function () {
+              if(!visible.features[id]){
+                visible.features[id] = turf.linestring([], feature.properties)
+              }
+              visible.features[id].geometry.coordinates.push(feature.geometry.coordinates[segment])
+              map.featureLayer.setGeoJSON(visible)
+              segment++
+
+              if (--i) animate(i)
+              else {
+                visible.features[id] = feature
+                segment = 0
+                animating = false
+              }
+           }, (interval*10) / feature.geometry.coordinates.length)
+        }
+        animate(feature.geometry.coordinates.length)
+        /*setTimeout(function(){
+          var setline = setInterval(function(){
             visible.features[id].geometry.coordinates.push(feature.geometry.coordinates[segment])
             map.featureLayer.setGeoJSON(visible)
             segment++
-
-            if (--i) animate(i)
-            else {
-              visible.features[id] = feature
-              segment = 0
-              animating = false
+            if(segment === feature.geometry.coordinates.length) {
+              clearInterval(setline)
             }
-         }, (interval*10) / feature.geometry.coordinates.length)
+          }, interval / feature.geometry.coordinates.length)
+        }, 1000)*/
+      } else if(feature.geometry.type === 'MultiLineString') {
+        visible.features.push(feature)
+        map.featureLayer.setGeoJSON(visible)
+      }else if(feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon') {
+        visible.features.push(feature)
+        map.featureLayer.setGeoJSON(visible)
       }
-      animate(feature.geometry.coordinates.length)
-      /*setTimeout(function(){
-        var setline = setInterval(function(){
-          visible.features[id].geometry.coordinates.push(feature.geometry.coordinates[segment])
-          map.featureLayer.setGeoJSON(visible)
-          segment++
-          if(segment === feature.geometry.coordinates.length) {
-            clearInterval(setline)
-          }
-        }, interval / feature.geometry.coordinates.length)
-      }, 1000)*/
-    } else if(feature.geometry.type === 'MultiLineString') {
-      visible.features.push(feature)
-      map.featureLayer.setGeoJSON(visible)
-    }else if(feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon') {
-      visible.features.push(feature)
-      map.featureLayer.setGeoJSON(visible)
+      
+      f++
+      if(f === geo.features.length) {
+        f = 0
+        visible.features = []
+      }
     }
-    
-    f++
-    if(f === geo.features.length) {
-      f = 0
-      visible.features = []
-    }
-  }
   }, interval)
 }
 </script>
