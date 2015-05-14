@@ -14,16 +14,30 @@
 <script>
 window.onload = function(){
   var geo = {{geojson}}
+  if(geo.type === 'Feature') geo = turf.featurecollection([geo])
 
   L.mapbox.accessToken = 'pk.eyJ1IjoibW9yZ2FuaGVybG9ja2VyIiwiYSI6Ii1zLU4xOWMifQ.FubD68OEerk74AYCLduMZQ';
   var map = L.mapbox.map('map', 'morganherlocker.m63a6il4')
-      .setView([40, -74.50], 9)
 
   var features = L.geoJson(geo, { style: L.mapbox.simplestyle.style })
 
   map.fitBounds(features.getBounds())
 
-  var f = 0;
+  geo.features.forEach(function(feature){
+    if(feature.geometry.type === 'Point' || feature.geometry.type === 'MultiPoint') {
+      feature.properties['marker-size'] = 'small'
+      feature.properties['marker-color'] = '#fff'
+    } else if(feature.geometry.type === 'LineString' || feature.geometry.type === 'MultiLineString') {
+      feature.properties['stroke'] = '#f0f'
+    } else if(feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon') {
+      feature.properties['stroke'] = '#0ff'
+      feature.properties['fill'] = '#0ff'
+      feature.properties['fill-opacity'] = 0.1
+    }
+  })
+
+  var interval = 500
+  var f = 0
   var visible = turf.featurecollection([])
   setInterval(function(){
     visible.features.push(geo.features[f])
@@ -33,9 +47,7 @@ window.onload = function(){
       f = 0
       visible.features = []
     }
-  },300)
-    
-  
+  }, interval)
 }
 </script>
 </head>

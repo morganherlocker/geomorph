@@ -17,5 +17,5 @@ cat algorithm.geojson | geomorph | hcat
 ###test
 
 ```sh
-cat test.json | node index.js
+cat fixtures/buffer.geojson | node index.js | hcat
 ```
