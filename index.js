@@ -34,7 +34,7 @@ function processGeo (geo) {
       broken.features.push(feature)
     } else if (feature.geometry.type === 'LineString') {
       feature.properties['stroke'] = '#f0f'
-      for(var i = 0; i < feature.geometry.coordinates.length-2; i++){
+      for(var i = 0; i < feature.geometry.coordinates.length-1; i++){
         var segment = turf.linestring(
           [feature.geometry.coordinates[i],feature.geometry.coordinates[i+1]],
           feature.properties)
