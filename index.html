@@ -2,9 +2,10 @@
 <html>
 <head>
 <meta charset=utf-8 />
-<title>A simple map</title>
+<title>geomorph</title>
 <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
 <script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.9/mapbox.js'></script>
+<script src='https://api.tiles.mapbox.com/mapbox.js/plugins/turf/v2.0.0/turf.min.js'></script>
 <link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.9/mapbox.css' rel='stylesheet' />
 <style>
   body { margin:0; padding:0; }
@@ -16,11 +17,25 @@ window.onload = function(){
 
   L.mapbox.accessToken = 'pk.eyJ1IjoibW9yZ2FuaGVybG9ja2VyIiwiYSI6Ii1zLU4xOWMifQ.FubD68OEerk74AYCLduMZQ';
   var map = L.mapbox.map('map', 'morganherlocker.m63a6il4')
-      .setView([40, -74.50], 9);
+      .setView([40, -74.50], 9)
 
-  var features = L.geoJson(geo, { style: L.mapbox.simplestyle.style }).addTo(map);
+  var features = L.geoJson(geo, { style: L.mapbox.simplestyle.style })
 
-  map.fitBounds(features.getBounds());
+  map.fitBounds(features.getBounds())
+
+  var f = 0;
+  var visible = turf.featurecollection([])
+  setInterval(function(){
+    visible.features.push(geo.features[f])
+    map.featureLayer.setGeoJSON(visible)
+    f++
+    if(f === geo.features.length) {
+      f = 0
+      visible.features = []
+    }
+  },300)
+    
+  
 }
 </script>
 </head>
