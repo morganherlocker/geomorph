@@ -1,6 +1,6 @@
 # geomorph
 
-`geomorph` takes line delimitted geojson featurecollections and animates them on a map. 
+`geomorph` takes a geojson featurecollection and animates it on a map. 
 
 ###install
 

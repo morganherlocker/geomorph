@@ -24,79 +24,20 @@ window.onload = function(){
 
   map.fitBounds(features.getBounds())
 
-  geo.features.forEach(function(feature){
-    if(feature.geometry.type === 'Point' || feature.geometry.type === 'MultiPoint') {
-      feature.properties['marker-size'] = 'small'
-      feature.properties['marker-color'] = '#fff'
-    } else if(feature.geometry.type === 'LineString' || feature.geometry.type === 'MultiLineString') {
-      feature.properties['stroke'] = '#f0f'
-    } else if(feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon') {
-      feature.properties['stroke'] = '#0ff'
-      feature.properties['fill'] = '#0ff'
-      feature.properties['fill-opacity'] = 0.1
-    }
-  })
-
-  var interval = 400
+  var interval = 500
   var f = 0
   var visible = turf.featurecollection([])
-  var animating = false
   setInterval(function(){
-    var feature = geo.features[f]
-    if(!animating){
-      if(feature.geometry.type === 'Point' || feature.geometry.type === 'MultiPoint') {
-        visible.features.push(feature)
-        map.featureLayer.setGeoJSON(visible)
-      } else if(feature.geometry.type === 'LineString') {
-        animating = true
-        animateLine(feature, visible, interval, function(){
-          animating = false
-        })
-      } else if(feature.geometry.type === 'MultiLineString') {
-        visible.features.push(feature)
-        map.featureLayer.setGeoJSON(visible)
-      } else if(feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon') {
-        animating = true
-        animateLine(turf.linestring(feature.geometry.coordinates[0], {stroke: '#0ff'}), visible, interval, function(){
-          visible.features.push(feature)
-          map.featureLayer.setGeoJSON(visible)
-          animating = false
-        })
-      }
-      if(f === geo.features.length) {
-        f = 0
-        visible.features.length = 0
-      }
-      f++
+    visible.features.push(geo.features[f])
+    map.featureLayer.setGeoJSON(visible)
+    f++
+    if(f === geo.features.length) {
+      f = 0
+      visible = turf.featurecollection([])
     }
   }, interval)
 }
 
-function animateLine(line, visible, time, done){
-  visible.features.push(turf.linestring([], line.properties))
-  var id = visible.features.length - 1
-  var segment = 0
-  var animate = function (i) {
-     setTimeout(function () {
-        if(!visible.features[id]){
-          visible.features[id] = turf.linestring([line.geometry.coordinates[segment],line.geometry.coordinates[segment+1]], line.properties)
-        }
-        visible.features[id].geometry.coordinates.push(line.geometry.coordinates[segment])
-        visible.features = visible.features.filter(function(n){ return n != undefined }); 
-        map.featureLayer.setGeoJSON(visible)
-        segment++
-
-        if (--i) animate(i)
-        else {
-          visible.features.pop()
-          visible.features.push(line)
-          segment = 0
-          done()
-        }
-     }, (time*3) / line.geometry.coordinates.length)
-  }
-  animate(line.geometry.coordinates.length)
-}
 </script>
 </head>
 <body>

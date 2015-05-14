@@ -23,6 +23,9 @@
   "homepage": "https://github.com/morganherlocker/geomorph",
   "dependencies": {
     "concat-stream": "1.4.7",
-    "minimist": "^1.1.1"
+    "geojson-flatten": "^0.1.0",
+    "geojson-normalize": "0.0.0",
+    "minimist": "^1.1.1",
+    "turf": "^2.0.2"
   }
 }
