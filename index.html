@@ -14,11 +14,13 @@
 <script>
 var map
 window.onload = function(){
+  var mapid = '{{map}}'
+  console.log(mapid)
   var geo = {{geojson}}
   if(geo.type === 'Feature') geo = turf.featurecollection([geo])
 
   L.mapbox.accessToken = 'pk.eyJ1IjoibW9yZ2FuaGVybG9ja2VyIiwiYSI6Ii1zLU4xOWMifQ.FubD68OEerk74AYCLduMZQ';
-  map = L.mapbox.map('map', 'morganherlocker.m63a6il4')
+  map = L.mapbox.map('map', mapid)
 
   var features = L.geoJson(geo, { style: L.mapbox.simplestyle.style })
 
@@ -41,9 +43,6 @@ window.onload = function(){
 </script>
 </head>
 <body>
-
-
-
 
 <div id='map'></div>
 

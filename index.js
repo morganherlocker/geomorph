@@ -6,6 +6,13 @@ var normalize = require('geojson-normalize')
 var flatten = require('geojson-flatten')
 var turf = require('turf')
 
+var maps = {
+  'dark': 'mapbox.dark',
+  'light': 'mapbox.light',
+  'satellite': 'morganherlocker.m6gb8hef',
+  'streets': 'mapbox.streets'
+}
+
 if(argv.h || argv.help){
   docs();
 } else {
@@ -14,9 +21,16 @@ if(argv.h || argv.help){
     geo = processGeo(geo)
     fs.readFile(__dirname+'/index.html', 'utf8', function(err, html){
       html = html.split('{{geojson}}').join(geo)
+
       if(argv.s) argv.speed = argv.s
       if(argv.speed) html = html.split('{{speed}}').join(argv.speed)
       else html = html.split('{{speed}}').join(400)
+
+      if(argv.m) argv.map = argv.m
+      if(maps[argv.map]) argv.map = maps[argv.map]
+      if(argv.map) html = html.split('{{map}}').join(argv.map)
+      else html = html.split('{{map}}').join('morganherlocker.m63a6il4')
+
       console.log(html)
     })
   }))
@@ -63,9 +77,10 @@ function processGeo (geo) {
 }
 
 function docs(){
-  console.log('geomorph\n===\n');
-  console.log('geomorph [file] | hcat\n');
-  console.log('cat [file] | geomorph | hcat\n');
-  console.log('-s --speed : number of miliseconds per frame\n');
-  console.log('-h --help : show docs\n');
+  console.log('geomorph\n===\n')
+  console.log('geomorph [file] | hcat\n')
+  console.log('cat [file] | geomorph | hcat\n')
+  console.log('-s --speed : number of miliseconds per frame\n')
+  console.log('-m --map : custom map id; defaults: dark, light, streets, satellite\n')
+  console.log('-h --help : show docs\n')
 }
