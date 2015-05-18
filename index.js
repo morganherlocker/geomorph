@@ -18,7 +18,10 @@ if(argv.h || argv.help){
 } else {
   ((argv._[0] && fs.createReadStream(argv._[0])) || process.stdin).pipe(concat(function(geo){
     var geo = geo.toString()
-    geo = processGeo(geo)
+
+    if(argv.f) argv.fast = argv.f
+
+    geo = processGeo(geo, argv.fast)
     fs.readFile(__dirname+'/index.html', 'utf8', function(err, html){
       html = html.split('{{geojson}}').join(geo)
 
@@ -36,7 +39,7 @@ if(argv.h || argv.help){
   }))
 }
 
-function processGeo (geo) {
+function processGeo (geo, fast) {
   geo = JSON.parse(geo)
   geo = flatten(normalize(geo))
 
@@ -48,21 +51,27 @@ function processGeo (geo) {
       broken.features.push(feature)
     } else if (feature.geometry.type === 'LineString') {
       feature.properties['stroke'] = '#f0f'
-      for(var i = 0; i < feature.geometry.coordinates.length-1; i++){
-        var segment = turf.linestring(
-          [feature.geometry.coordinates[i],feature.geometry.coordinates[i+1]],
-          feature.properties)
-        broken.features.push(segment)
-      }
-    } else if (feature.geometry.type === 'Polygon') {
-      feature.geometry.coordinates.forEach(function(ring){
-        for(var i = 0; i < ring.length-2; i++){
+      if(fast) {
+        broken.features.push(feature)
+      } else {
+        for(var i = 0; i < feature.geometry.coordinates.length-1; i++){
           var segment = turf.linestring(
-            [ring[i], ring[i+1]],
-            {stroke: '#0ff'})
+            [feature.geometry.coordinates[i],feature.geometry.coordinates[i+1]],
+            feature.properties)
           broken.features.push(segment)
         }
-      })
+      }
+    } else if (feature.geometry.type === 'Polygon') {
+      if(!fast){
+        feature.geometry.coordinates.forEach(function(ring){
+          for(var i = 0; i < ring.length-2; i++){
+            var segment = turf.linestring(
+              [ring[i], ring[i+1]],
+              {stroke: '#0ff'})
+            broken.features.push(segment)
+          }
+        })
+      }
       
       feature.properties['fill'] = '#0ff'
       feature.properties['stroke'] = '#0ff'
@@ -82,5 +91,6 @@ function docs(){
   console.log('cat [file] | geomorph | hcat\n')
   console.log('-s --speed : number of miliseconds per frame\n')
   console.log('-m --map : custom map id; defaults: dark, light, streets, satellite\n')
+  console.log('-f --fast : if flagged, polygons and strings will not be rendered piece by piece\n')
   console.log('-h --help : show docs\n')
 }

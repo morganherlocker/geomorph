@@ -20,7 +20,11 @@ window.onload = function(){
   if(geo.type === 'Feature') geo = turf.featurecollection([geo])
 
   L.mapbox.accessToken = 'pk.eyJ1IjoibW9yZ2FuaGVybG9ja2VyIiwiYSI6Ii1zLU4xOWMifQ.FubD68OEerk74AYCLduMZQ';
-  map = L.mapbox.map('map', mapid)
+  map = L.mapbox.map('map', mapid, {
+    tileLayer: {
+      maxNativeZoom: 17 // The map will use zoom level 19 tiles for all zoom levels past 19
+    }
+  })
 
   var features = L.geoJson(geo, { style: L.mapbox.simplestyle.style })
 
